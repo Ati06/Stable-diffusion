@@ -1,5 +1,6 @@
 import tkinter as tk  # Importing the tkinter library for GUI components
 from tkvideo import tkvideo  # Importing tkvideo for video playback in tkinter
+import pygame  # For playing background music
 import Register  # Importing the Register module
 import Login  # Importing the Login module
 
@@ -25,6 +26,11 @@ video_label.pack(expand=True, fill="both")
 # Play the background video using tkvideo
 player = tkvideo("B3.mp4", video_label, loop=1, size=(screen_width, screen_height))
 player.play()
+
+# Initialize pygame mixer for background music
+pygame.mixer.init()
+pygame.mixer.music.load("bg.mp3")  # Make sure bg.mp3 is in the same folder or provide full path
+pygame.mixer.music.play(-1)  # Loop indefinitely
 
 # Calculate dimensions and position for the central panel
 panel_width = int(screen_width * 0.35)
@@ -92,7 +98,7 @@ def show_buttons():
         text="🧠 AI Image Generator\n"
              "Type anything — and we'll turn it into an image using deep learning magic!\n"
              "Built with PyTorch, CLIP, and Stable Diffusion under the hood."
-             "\nProject by Shreya 💁‍♀️ and Atirath 👨‍💻\n under Guidance of Prof. Helsing 🦹️✨",
+             "\nProject by Shreya 💁‍♀ and Atirath 👨‍💻\n under Guidance of Prof. Helsing 🦹✨",
         font=(font_family, int(small_font_size * 0.6)),
         fg="black",
         bg=panel_bg_color,
