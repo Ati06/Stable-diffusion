@@ -9,7 +9,6 @@ def is_valid_email(email):
     return re.match(email_regex, email) is not None
 
 
-
 def is_strong_password(password):
     if len(password) < 8:
         return False
@@ -38,36 +37,37 @@ def load_registrations():
         return []
 
 
-def save_registration(username, email, password):
-    user_data = {"username": username, "email": email, "password": password}
+def save_registration(name, email, password):
+    user_data = {"name": name, "email": email, "password": password}
     with open("data.pkl", "ab") as file:
         pickle.dump(user_data, file)
 
 
-def show_register(frame, go_back_callback, player, button_color, label_title_color):
+def show_register(frame, go_back_callback, player, button_color, label_title_color, panel_width):
     for widget in frame.winfo_children():
         widget.destroy()
-
-    # bg_label = tk.Label(frame, image=blurred_bg_img)
-    # bg_label.place(x=0, y=0, relwidth=1, relheight=1)
 
     form = tk.Frame(frame, bg="#f0e3da")
     form.pack(pady=30)
 
-    tk.Label(form, text="Register!", font=("Comic Sans MS", 36), bg=label_title_color, fg="white", borderwidth=1).grid(row=0, column=0, columnspan=2, pady=20)
+    tk.Label(form, text="  Register!  ", font=("Comic Sans MS", (int)(panel_width*0.05)), bg=label_title_color, fg="white", borderwidth=1).grid(
+        row=0, column=0, columnspan=2, pady=30
+    )
 
     labels = ["Name", "Email", "Password", "Re-Password"]
     entries, error_labels = {}, {}
 
     for i, label in enumerate(labels):
-        tk.Label(form, text=label, font=("Comic Sans MS", 16), bg=button_color, fg="white").grid(row=1+i*2, column=0, padx=10, sticky="e")
+        tk.Label(form, text=label, font=("Comic Sans MS", (int)(panel_width*0.03)), bg=button_color, fg="white").grid(
+            row=1 + i * 2, column=0, padx=10, sticky="e"
+        )
 
-        entry = tk.Entry(form, font=("Comic Sans MS", 14), show="*" if "Password" in label else "", width=25)
-        entry.grid(row=1+i*2, column=1, padx=10, pady=(5, 10), sticky="w")
+        entry = tk.Entry(form, font=("Comic Sans MS", (int)(panel_width*0.03)), show="*" if "Password" in label else "", width=(int)(panel_width*0.06))
+        entry.grid(row=1 + i * 2, column=1, padx=10, pady=(5, 10), sticky="w")
         entries[label] = entry
 
-        error = tk.Label(form, text="", font=("Comic Sans MS", 12), fg="white", bg="#c71306", justify="left", anchor="w")
-        error.grid(row=2+i*2, column=1, columnspan=1, padx=10, pady=(0, 8), sticky="w")
+        error = tk.Label(form, text="", font=("Comic Sans MS", (int)(panel_width*0.02)), fg="white", bg="#7a0b29", justify="left", anchor="w")
+        error.grid(row=2 + i * 2, column=1, columnspan=1, padx=10, pady=(0, 8), sticky="w")
         error.grid_remove()
         error_labels[label] = error
 
@@ -171,10 +171,36 @@ def show_register(frame, go_back_callback, player, button_color, label_title_col
             save_registration(username, email, password)
             go_back_callback()
 
-    tk.Button(form, text="Register", font=("Comic Sans MS", 14), bg=label_title_color, fg="white", command=register_logic).grid(
-        row=len(labels)*2+1, column=0, columnspan=2, pady=10
-    )
-    tk.Button(form, text="Back", font=("Comic Sans MS", 14), bg=label_title_color, fg="white", command=go_back_callback).grid(
-        row=len(labels)*2+2, column=0, columnspan=2, pady=5
-    )
+    register_canvas = tk.Canvas(form, width=(int)(panel_width*0.2), height=(int)(panel_width*0.5), bg="#f0e3da", highlightthickness=0, bd=0)
+    register_canvas.grid(row=len(labels) * 2 + 1, column=0, columnspan=2, pady=10)
 
+    register_button = tk.Label(
+        register_canvas,
+        text="Register",
+        font=("Comic Sans MS", (int)(panel_width*0.035)),
+        bg=label_title_color,
+        fg="white",
+        width=(int)(panel_width*0.030),
+        height=1
+    )
+    register_button.pack(fill="both", expand=True)
+    register_button.bind("<Button-1>", lambda e: register_logic())
+    register_button.bind("<Enter>", lambda e: register_button.config(bg="#2f2b2a"))
+    register_button.bind("<Leave>", lambda e: register_button.config(bg=label_title_color))
+
+    back_canvas = tk.Canvas(form, width=(int)(panel_width*0.2), height=(int)(panel_width*0.5), bg="#f0e3da", highlightthickness=0, bd=0)
+    back_canvas.grid(row=len(labels) * 2 + 2, column=0, columnspan=2, pady=5)
+
+    back_button = tk.Label(
+        back_canvas,
+        text="Back",
+        font=("Comic Sans MS", (int)(panel_width*0.035)),
+        bg=label_title_color,
+        fg="white",
+        width=(int)(panel_width*0.03),
+        height=1
+    )
+    back_button.pack(fill="both", expand=True)
+    back_button.bind("<Button-1>", lambda e: go_back_callback())
+    back_button.bind("<Enter>", lambda e: back_button.config(bg="#2f2b2a"))
+    back_button.bind("<Leave>", lambda e: back_button.config(bg=label_title_color))
