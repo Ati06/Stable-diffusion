@@ -1,0 +1,62 @@
+import pickle
+import os
+import Login  # Ensure this matches your actual filename
+
+# Helper function to write test data to data.pkl
+def write_test_data(file_path, data):
+    with open(file_path, "wb") as f:
+        pickle.dump(data, f)
+
+# Test 1: Successful login with correct credentials
+def test_successful_login(tmp_path):
+    # Arrange
+    test_data = {"email": "user@example.com", "password": "abc123"}
+    data_file = tmp_path / "data.pkl"
+    write_test_data(data_file, test_data)
+
+    # Act
+    os.chdir(tmp_path)  # Change working directory to tmp_path
+    registrations = Login.load_registrations()
+    login_success = any(
+        user["email"] == "user@example.com" and user["password"] == "abc123"
+        for user in registrations
+    )
+
+    # Assert
+    assert login_success
+
+# Test 2: Failed login with incorrect credentials
+def test_failed_login_incorrect_credentials(tmp_path):
+    # Arrange
+    test_data = {"email": "user@example.com", "password": "abc123"}
+    data_file = tmp_path / "data.pkl"
+    write_test_data(data_file, test_data)
+
+    # Act
+    os.chdir(tmp_path)
+    registrations = Login.load_registrations()
+    login_success = any(
+        user["email"] == "wrong@example.com" and user["password"] == "wrongpass"
+        for user in registrations
+    )
+
+    # Assert
+    assert not login_success
+
+# Test 3: Failed login with empty email and password
+def test_failed_login_empty_fields(tmp_path):
+    # Arrange
+    test_data = {"email": "user@example.com", "password": "abc123"}
+    data_file = tmp_path / "data.pkl"
+    write_test_data(data_file, test_data)
+
+    # Act
+    os.chdir(tmp_path)
+    registrations = Login.load_registrations()
+    login_success = any(
+        user["email"] == "" and user["password"] == ""
+        for user in registrations
+    )
+
+    # Assert
+    assert not login_success
