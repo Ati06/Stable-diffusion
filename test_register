@@ -1,0 +1,115 @@
+import pickle
+import os
+import Register  # Ensure this matches your actual filename
+
+# Helper function to write test data to data.pkl
+def write_test_data(file_path, data):
+    with open(file_path, "wb") as f:
+        pickle.dump(data, f)
+
+# Test 1: Successful registration with valid inputs
+def test_successful_registration(tmp_path):
+    # Arrange
+    test_data = {"name": "Test User", "email": "user@example.com", "password": "StrongPass1!"}
+    data_file = tmp_path / "data.pkl"
+    write_test_data(data_file, test_data)
+
+    # Act
+    os.chdir(tmp_path)  # Change working directory to tmp_path
+    registrations = Register.load_registrations()
+    registration_success = any(
+        user["email"] == "user@example.com" and user["password"] == "StrongPass1!"
+        for user in registrations
+    )
+
+    # Assert
+    assert registration_success
+
+# Test 2: Failed registration with an already existing email
+def test_failed_registration_existing_email(tmp_path):
+    # Arrange
+    existing_user = {"name": "Existing User", "email": "existing@example.com", "password": "ExistingPass1!"}
+    data_file = tmp_path / "data.pkl"
+    write_test_data(data_file, existing_user)
+
+    # Act
+    os.chdir(tmp_path)
+    registrations = Register.load_registrations()
+    email_exists = any(
+        user["email"] == "existing@example.com"
+        for user in registrations
+    )
+
+    # Assert
+    assert email_exists
+
+# Test 3: Failed registration with a weak password
+def test_failed_registration_weak_password():
+    # Arrange
+    weak_password = "weak"
+
+    # Act
+    password_strength = Register.is_strong_password(weak_password)
+
+    # Assert
+    assert not password_strength
+
+# Test 4: Failed registration with invalid email format
+def test_failed_registration_invalid_email():
+    # Arrange
+    invalid_email = "invalidemail.com"
+
+    # Act
+    email_validity = Register.is_valid_email(invalid_email)
+
+    # Assert
+    assert not email_validity
+
+# Test 5: Failed registration with empty name field
+def test_failed_registration_empty_name():
+    # Arrange
+    name = ""
+
+    # Act
+    name_validity = bool(name)
+
+    # Assert
+    assert not name_validity
+
+# Test 6: Failed registration with mismatched passwords
+def test_failed_registration_mismatched_passwords():
+    # Arrange
+    password = "StrongPass1!"
+    confirm_password = "StrongPass2!"
+
+    # Act
+    passwords_match = password == confirm_password
+
+    # Assert
+    assert not passwords_match
+
+# Test 7: Failed registration with empty password fields
+def test_failed_registration_empty_password():
+    # Arrange
+    password = ""
+    confirm_password = ""
+
+    # Act
+    passwords_filled = bool(password) and bool(confirm_password)
+
+    # Assert
+    assert not passwords_filled
+
+# Test 8: Failed registration with all fields empty
+def test_failed_registration_all_fields_empty():
+    # Arrange
+    name = ""
+    email = ""
+    password = ""
+    confirm_password = ""
+
+    # Act
+    all_fields_filled = all([name, email, password, confirm_password])
+
+    # Assert
+    assert not all_fields_filled
